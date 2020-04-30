@@ -144,6 +144,15 @@ class _MSDataLoaderIter(DataLoader):
             for _ in range(2 * self.num_workers):
                 self._put_indices()
 
+    def _put_indices(self):
+        assert self.batches_outstanding < 2 * self.num_workers
+        indices = next(self.sample_iter, None)
+        if indices is None:
+            return
+        self.index_queues[self.worker_queue_idx].put((self.send_idx, indices))
+        self.worker_queue_idx = (self.worker_queue_idx + 1) % self.num_workers
+        self.batches_outstanding += 1
+        self.send_idx += 1
 
 class MSDataLoader(DataLoader):
 
