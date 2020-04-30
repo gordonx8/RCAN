@@ -144,6 +144,9 @@ class _MSDataLoaderIter(IterableDataset):
             for _ in range(2 * self.num_workers):
                 self._put_indices()
 
+    def __iter__(self):
+        return self.sample_iter
+
     def _put_indices(self):
         assert self.batches_outstanding < 2 * self.num_workers
         indices = next(self.sample_iter, None)
